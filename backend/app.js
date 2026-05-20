@@ -56,6 +56,46 @@ app.post('/users', (req, res) => {
   );
 });
 
+app.put('/users/:id', (req, res) => {
+  const { id } = req.params;
+  const { name } = req.body;
+  
+  connection.query(
+    'UPDATE users SET name = ? WHERE id = ?',
+    [name, id],
+    (err, results) => {
+      if (err) {
+        return res.status(500).json({ error: err.message });
+      }
+      // Mengecek apakah ada baris yang terupdate
+      if (results.affectedRows === 0) {
+        return res.status(404).json({ message: 'User tidak ditemukan' });
+      }
+      res.json({ id, name, message: 'User berhasil diupdate' });
+    }
+  );
+});
+
+
+app.delete('/users/:id', (req, res) => {
+  const { id } = req.params;
+  
+  connection.query(
+    'DELETE FROM users WHERE id = ?',
+    [id],
+    (err, results) => {
+      if (err) {
+        return res.status(500).json({ error: err.message });
+      }
+      // Mengecek apakah ada baris yang terhapus
+      if (results.affectedRows === 0) {
+        return res.status(404).json({ message: 'User tidak ditemukan' });
+      }
+      res.json({ message: 'User berhasil dihapus' });
+    }
+  );
+});
+
 app.listen(process.env.APP_PORT, '0.0.0.0', () => {
   console.log(`Server running on port ${process.env.APP_PORT}`);
 });
